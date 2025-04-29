@@ -2,54 +2,87 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    protected $primaryKey = 'id';
+    
     protected $fillable = [
         'name',
         'email',
+        'email_verified_at',
         'password',
         'cui',
-        'role_id'
+        'role_id',
+        'is_active',
+        'remember_token',
+        'last_login_at',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'last_login_at' => 'datetime',
+        'is_active' => 'boolean',
+        'password' => 'hashed',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    public function person()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->belongsTo(Person::class, 'cui', 'cui');
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function exhumations()
+    {
+        return $this->hasMany(Exhumation::class);
     }
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return true; // O tu lógica de permisos
+        return $this->is_active && $this->role->name !== 'Usuario de Consulta';
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role->name === 'Administrador';
+    }
+
+    public function isHelper(): bool
+    {
+        return $this->role->name === 'Ayudante';
+    }
+
+    public function isAuditor(): bool
+    {
+        return $this->role->name === 'Auditor';
+    }
+
+    public function isConsultationUser(): bool
+    {
+        return $this->role->name === 'Usuario de Consulta';
     }
 }
