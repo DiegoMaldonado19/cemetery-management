@@ -5,6 +5,7 @@ namespace App\Filament\Resources\PaymentResource\Pages;
 use App\Filament\Resources\PaymentResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Support\Facades\Auth;
 
 class ViewPayment extends ViewRecord
 {
@@ -14,7 +15,7 @@ class ViewPayment extends ViewRecord
     {
         return [
             Actions\EditAction::make()
-                ->visible(fn() => auth()->user()->isAdmin() || auth()->user()->isHelper()),
+                ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()),
             Actions\Action::make('printReceipt')
                 ->label('Imprimir Boleta')
                 ->icon('heroicon-o-printer')

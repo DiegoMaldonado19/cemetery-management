@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ExhumationResource\Pages;
 use App\Filament\Resources\ExhumationResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Support\Facades\Auth;
 
 class ViewExhumation extends ViewRecord
 {
@@ -14,7 +15,7 @@ class ViewExhumation extends ViewRecord
     {
         return [
             Actions\EditAction::make()
-                ->visible(fn() => auth()->user()->isAdmin() || auth()->user()->isHelper()),
+                ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()),
             Actions\Action::make('downloadAgreement')
                 ->label('Descargar Acuerdo')
                 ->icon('heroicon-o-document-arrow-down')

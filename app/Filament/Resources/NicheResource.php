@@ -21,13 +21,13 @@ class NicheResource extends Resource
     protected static ?string $model = Niche::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    
+
     protected static ?string $navigationGroup = 'Gestión de Nichos';
-    
+
     protected static ?string $navigationLabel = 'Nichos';
-    
+
     protected static ?string $modelLabel = 'Nicho';
-    
+
     protected static ?string $pluralModelLabel = 'Nichos';
 
     public static function form(Form $form): Form
@@ -52,7 +52,7 @@ class NicheResource extends Resource
                             ->required()
                             ->searchable(),
                     ])->columns(3),
-                
+
                 Forms\Components\Section::make('Ubicación')
                     ->schema([
                         Forms\Components\Select::make('street_id')
@@ -76,7 +76,7 @@ class NicheResource extends Resource
                             ->maxLength(65535)
                             ->columnSpanFull(),
                     ])->columns(2),
-                
+
                 Forms\Components\Section::make('Personaje Histórico')
                     ->schema([
                         Forms\Components\Select::make('historical_figure_id')
@@ -111,7 +111,7 @@ class NicheResource extends Resource
                     ->label('Estado')
                     ->sortable()
                     ->badge()
-                    ->color(fn (string $state): string => 
+                    ->color(fn (string $state): string =>
                         match ($state) {
                             'Disponible' => 'success',
                             'Ocupado' => 'warning',
@@ -131,11 +131,11 @@ class NicheResource extends Resource
                     ->label('Personaje Histórico')
                     ->formatStateUsing(function ($record) {
                         if (!$record->historical_figure_id) return null;
-                        
+
                         if ($record->historicalFigure->cui) {
                             return $record->historicalFigure->person->first_name . ' ' . $record->historicalFigure->person->last_name;
                         }
-                        
+
                         return ($record->historicalFigure->historical_first_name ?? '') . ' ' . ($record->historicalFigure->historical_last_name ?? '');
                     })
                     ->badge()
@@ -166,23 +166,23 @@ class NicheResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn () => auth()->user()->isAdmin() || auth()->user()->isHelper()),
+                    ->visible(fn () => Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn () => auth()->user()->isAdmin()),
+                        ->visible(fn () => Auth::hasUser() && Auth::user()->isAdmin()),
                 ]),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             RelationManagers\ContractsRelationManager::make(),
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -191,13 +191,13 @@ class NicheResource extends Resource
             'view' => Pages\ViewNiche::route('/{record}'),
             'edit' => Pages\EditNiche::route('/{record}/edit'),
         ];
-    }    
+    }
 
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery()
             ->with(['type', 'status', 'street.block.section', 'avenue.block.section', 'historicalFigure.person']);
-            
+
         return $query;
     }
 

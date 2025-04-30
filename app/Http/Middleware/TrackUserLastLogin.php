@@ -18,7 +18,7 @@ class TrackUserLastLogin
      */
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check()) {
+        if (Auth::hasUser() && Auth::user()) {
             // Actualizar solo si ha pasado al menos 1 minuto desde la última actualización
             // para evitar actualizaciones constantes de la base de datos
             $user = Auth::user();

@@ -10,6 +10,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
@@ -99,7 +100,7 @@ class PaymentsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('status.name')
                     ->label('Estado')
                     ->badge()
-                    ->color(fn (string $state): string => 
+                    ->color(fn (string $state): string =>
                         match ($state) {
                             'Pagado' => 'success',
                             'No Pagado' => 'danger',
@@ -128,23 +129,23 @@ class PaymentsRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make()
                     ->using(function (RelationManager $livewire, array $data): mixed {
                         // Añadir usuario actual
-                        $data['user_id'] = auth()->id();
-                        
+                        $data['user_id'] = Auth::hasUser() && Auth::user() ? Auth::id() : null;
+
                         return $livewire->getRelationship()->create($data);
                     })
-                    ->visible(fn () => auth()->user()->isAdmin() || auth()->user()->isHelper()),
+                    ->visible(fn () => Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn () => auth()->user()->isAdmin() || auth()->user()->isHelper()),
+                    ->visible(fn () => Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()),
                 Tables\Actions\DeleteAction::make()
-                    ->visible(fn () => auth()->user()->isAdmin()),
+                    ->visible(fn () => Auth::hasUser() && Auth::user()->isAdmin()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn () => auth()->user()->isAdmin()),
+                        ->visible(fn () => Auth::hasUser() && Auth::user()->isAdmin()),
                 ]),
             ]);
     }

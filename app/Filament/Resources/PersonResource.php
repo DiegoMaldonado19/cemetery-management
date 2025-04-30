@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class PersonResource extends Resource
 {
@@ -22,13 +23,13 @@ class PersonResource extends Resource
     protected static ?string $recordTitleAttribute = 'full_name';
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
-    
+
     protected static ?string $navigationGroup = 'Personas y Usuarios';
-    
+
     protected static ?string $navigationLabel = 'Personas';
-    
+
     protected static ?string $modelLabel = 'Persona';
-    
+
     protected static ?string $pluralModelLabel = 'Personas';
 
     public static function form(Form $form): Form
@@ -61,7 +62,7 @@ class PersonResource extends Resource
                     ->label('Teléfono')
                     ->tel()
                     ->maxLength(20),
-                    
+
                 Forms\Components\Section::make('Dirección Principal')
                     ->schema([
                         Forms\Components\Select::make('department_id')
@@ -138,14 +139,14 @@ class PersonResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn () => auth()->user()->isAdmin() || auth()->user()->isHelper()),
+                    ->visible(fn () => Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()),
                 Tables\Actions\Action::make('registerDeceased')
                     ->label('Registrar Fallecimiento')
                     ->icon('heroicon-o-document-plus')
                     ->color('danger')
                     ->url(fn (Person $record) => route('filament.admin.resources.people.deceased.create', $record))
-                    ->visible(fn (Person $record) => 
-                        (auth()->user()->isAdmin() || auth()->user()->isHelper()) && 
+                    ->visible(fn (Person $record) =>
+                        (Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()) &&
                         $record->deceased === null
                     ),
                 Tables\Actions\Action::make('registerHistorical')
@@ -153,19 +154,19 @@ class PersonResource extends Resource
                     ->icon('heroicon-o-star')
                     ->color('warning')
                     ->url(fn (Person $record) => route('filament.admin.resources.people.historical.create', $record))
-                    ->visible(fn (Person $record) => 
-                        auth()->user()->isAdmin() && 
+                    ->visible(fn (Person $record) =>
+                        Auth::hasUser() && Auth::user()->isAdmin() &&
                         $record->historicalFigure === null
                     ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn () => auth()->user()->isAdmin()),
+                        ->visible(fn () => Auth::hasUser() && Auth::user()->isAdmin()),
                 ]),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
@@ -173,7 +174,7 @@ class PersonResource extends Resource
             RelationManagers\ResponsibleContractsRelationManager::make(),
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -184,7 +185,7 @@ class PersonResource extends Resource
             'deceased.create' => Pages\RegisterDeceased::route('/{record}/deceased/create'),
             'historical.create' => Pages\RegisterHistorical::route('/{record}/historical/create'),
         ];
-    }    
+    }
 
     public static function getEloquentQuery(): Builder
     {

@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
@@ -166,12 +167,12 @@ class UserResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn() => auth()->user() && auth()->user()->role && auth()->user()->role->name === 'Administrador'),
+                    ->visible(fn() => Auth::hasUser() && Auth::user() && Auth::user()->role && Auth::user()->role->name === 'Administrador'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn() => auth()->user() && auth()->user()->role && auth()->user()->role->name === 'Administrador'),
+                        ->visible(fn() => Auth::hasUser() && Auth::user() && Auth::user()->role && Auth::user()->role->name === 'Administrador'),
                 ]),
             ]);
     }
@@ -202,6 +203,6 @@ class UserResource extends Resource
     // Solo los administradores pueden acceder a la gestión de usuarios
     public static function canAccess(): bool
     {
-        return auth()->user() && auth()->user()->role && (auth()->user()->role->name === 'Administrador' || auth()->user()->role->name === 'Auditor');
+        return Auth::hasUser() && Auth::user() && Auth::user()->role && (Auth::user()->role->name === 'Administrador' || Auth::user()->role->name === 'Auditor');
     }
 }

@@ -11,6 +11,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class NichesRelationManager extends RelationManager
 {
@@ -110,7 +111,7 @@ class NichesRelationManager extends RelationManager
 
                         return null;
                     })
-                    ->visible(fn() => auth()->user()->isAdmin()),
+                    ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin()),
             ])
             ->actions([
                 Tables\Actions\DetachAction::make()
@@ -122,13 +123,13 @@ class NichesRelationManager extends RelationManager
 
                         return $record;
                     })
-                    ->visible(fn() => auth()->user()->isAdmin()),
+                    ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin()),
                 Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DetachBulkAction::make()
-                        ->visible(fn() => auth()->user()->isAdmin()),
+                        ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin()),
                 ]),
             ]);
     }

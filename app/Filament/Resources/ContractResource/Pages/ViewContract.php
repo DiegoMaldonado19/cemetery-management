@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ContractResource\Pages;
 use App\Filament\Resources\ContractResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Support\Facades\Auth;
 
 class ViewContract extends ViewRecord
 {
@@ -14,7 +15,7 @@ class ViewContract extends ViewRecord
     {
         return [
             Actions\EditAction::make()
-                ->visible(fn() => auth()->user()->isAdmin()),
+                ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin()),
         ];
     }
 }

@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class ResponsibleContractsRelationManager extends RelationManager
 {
@@ -56,33 +57,30 @@ class ResponsibleContractsRelationManager extends RelationManager
 
                 Forms\Components\DatePicker::make('start_date')
                     ->label('Fecha de Inicio')
-                    ->required()
-                    ->default(now()),
+                    ->default(now())
+                    ->required(),
 
                 Forms\Components\DatePicker::make('end_date')
                     ->label('Fecha de Finalización')
-                    ->required()
                     ->default(
                         fn($get) =>
                         Carbon::parse($get('start_date'))->addYears(6)
                     )
-                    ->beforeOrEqual('grace_date')
-                    ->afterOrEqual('start_date'),
+                    ->required(),
 
                 Forms\Components\DatePicker::make('grace_date')
                     ->label('Fecha de Gracia')
-                    ->required()
                     ->default(
                         fn($get) =>
                         Carbon::parse($get('end_date'))->addYear()
                     )
-                    ->afterOrEqual('end_date'),
+                    ->required(),
 
                 Forms\Components\Select::make('contract_status_id')
                     ->label('Estado del Contrato')
                     ->options(ContractStatus::pluck('name', 'id'))
-                    ->required()
-                    ->default(fn() => ContractStatus::where('name', 'Vigente')->first()?->id),
+                    ->default(fn () => ContractStatus::where('name', 'Vigente')->first()?->id)
+                    ->required(),
 
                 Forms\Components\Textarea::make('notes')
                     ->label('Notas')
@@ -113,20 +111,14 @@ class ResponsibleContractsRelationManager extends RelationManager
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('start_date')
-                    ->label('Fecha Inicio')
+                    ->label('Inicio')
                     ->date('d/m/Y')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('end_date')
-                    ->label('Fecha Fin')
+                    ->label('Finalización')
                     ->date('d/m/Y')
-                    ->sortable()
-                    ->description(
-                        fn($record) =>
-                        Carbon::parse($record->end_date)->isPast()
-                            ? 'Vencido hace ' . Carbon::parse($record->end_date)->diffForHumans()
-                            : 'Vence en ' . Carbon::parse($record->end_date)->diffForHumans()
-                    ),
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('status.name')
                     ->label('Estado')
@@ -156,8 +148,7 @@ class ResponsibleContractsRelationManager extends RelationManager
                         return $query
                             ->where('end_date', '>=', $today)
                             ->where('end_date', '<=', $in90Days);
-                    })
-                    ->toggle(),
+                    }),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
@@ -167,17 +158,17 @@ class ResponsibleContractsRelationManager extends RelationManager
 
                         return $livewire->getRelationship()->create($data);
                     })
-                    ->visible(fn() => auth()->user()->isAdmin() || auth()->user()->isHelper()),
+                    ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn() => auth()->user()->isAdmin()),
+                    ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn() => auth()->user()->isAdmin()),
+                        ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin()),
                 ]),
             ]);
     }

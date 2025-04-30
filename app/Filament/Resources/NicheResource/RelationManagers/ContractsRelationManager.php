@@ -11,14 +11,16 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ContractsRelationManager extends RelationManager
 {
     protected static string $relationship = 'contracts';
 
     protected static ?string $recordTitleAttribute = 'id';
-    
+
     protected static ?string $title = 'Contratos';
 
     public function form(Form $form): Form
@@ -38,7 +40,7 @@ class ContractsRelationManager extends RelationManager
                 Forms\Components\Select::make('responsible_cui')
                     ->label('Responsable')
                     ->options(Person::pluck(
-                        \DB::raw("CONCAT(first_name, ' ', last_name)"), 
+                        DB::raw("CONCAT(first_name, ' ', last_name)"),
                         'cui'
                     ))
                     ->searchable()
@@ -94,7 +96,7 @@ class ContractsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('status.name')
                     ->label('Estado')
                     ->badge()
-                    ->color(fn (string $state): string => 
+                    ->color(fn (string $state): string =>
                         match ($state) {
                             'Vigente' => 'success',
                             'En Gracia' => 'warning',
@@ -113,7 +115,7 @@ class ContractsRelationManager extends RelationManager
                     ->query(function (Builder $query): Builder {
                         $today = Carbon::today();
                         $in90Days = $today->copy()->addDays(90);
-                    
+
                         return $query
                             ->where('end_date', '>=', $today)
                             ->where('end_date', '<=', $in90Days);
@@ -121,17 +123,17 @@ class ContractsRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
-                    ->visible(fn () => auth()->user()->isAdmin() || auth()->user()->isHelper()),
+                    ->visible(fn () => Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn () => auth()->user()->isAdmin()),
+                    ->visible(fn () => Auth::hasUser() && Auth::user()->isAdmin()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn () => auth()->user()->isAdmin()),
+                        ->visible(fn () => Auth::hasUser() && Auth::user()->isAdmin()),
                 ]),
             ]);
     }

@@ -11,6 +11,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Pages\Page;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class RegisterHistorical extends Page
@@ -84,7 +85,7 @@ class RegisterHistorical extends Page
                 'changed_field' => 'creación',
                 'old_value' => 'Ninguno',
                 'new_value' => 'Nuevo personaje histórico registrado',
-                'user_id' => auth()->id(),
+                'user_id' => Auth::hasUser() && Auth::user() ? Auth::id() : null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

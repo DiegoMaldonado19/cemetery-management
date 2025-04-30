@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class PaymentResource extends Resource
@@ -229,7 +230,7 @@ class PaymentResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn() => auth()->user()->isAdmin() || auth()->user()->isHelper()),
+                    ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()),
                 Tables\Actions\Action::make('printReceipt')
                     ->label('Imprimir Boleta')
                     ->icon('heroicon-o-printer')
@@ -239,7 +240,7 @@ class PaymentResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn() => auth()->user()->isAdmin()),
+                        ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin()),
                 ]),
             ]);
     }
@@ -291,7 +292,7 @@ class PaymentResource extends Resource
                 'changed_field' => 'creación',
                 'old_value' => 'Ninguno',
                 'new_value' => 'Nuevo pago registrado por monto: Q' . number_format($payment->amount, 2),
-                'user_id' => auth()->id(),
+                'user_id' => Auth::hasUser() && Auth::user() ? Auth::id() : null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -329,7 +330,7 @@ class PaymentResource extends Resource
                     'changed_field' => 'renovación',
                     'old_value' => $oldValues['payment_status_id'],
                     'new_value' => 'Contrato renovado por pago #' . $payment->id,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::hasUser() && Auth::user() ? Auth::id() : null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -343,7 +344,7 @@ class PaymentResource extends Resource
                     'changed_field' => 'estado_de_pago',
                     'old_value' => $oldValues['payment_status_id'],
                     'new_value' => $newValues['payment_status_id'],
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::hasUser() && Auth::user() ? Auth::id() : null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -361,7 +362,7 @@ class PaymentResource extends Resource
                     'changed_field' => 'fecha_de_pago',
                     'old_value' => $oldValues['payment_date'] === null ? 'No definida' : $oldValues['payment_date'],
                     'new_value' => $newValues['payment_date'] === null ? 'No definida' : $newValues['payment_date'],
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::hasUser() && Auth::user() ? Auth::id() : null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -379,7 +380,7 @@ class PaymentResource extends Resource
                     'changed_field' => 'ruta_comprobante',
                     'old_value' => $oldValues['receipt_file_path'] === null ? 'No definida' : $oldValues['receipt_file_path'],
                     'new_value' => $newValues['receipt_file_path'] === null ? 'No definida' : $newValues['receipt_file_path'],
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::hasUser() && Auth::user() ? Auth::id() : null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

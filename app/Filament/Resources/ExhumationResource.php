@@ -19,6 +19,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ExhumationResource extends Resource
@@ -265,7 +266,7 @@ class ExhumationResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn() => auth()->user()->isAdmin() || auth()->user()->isHelper()),
+                    ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()),
                 Tables\Actions\Action::make('downloadAgreement')
                     ->label('Descargar Acuerdo')
                     ->icon('heroicon-o-document-arrow-down')
@@ -276,7 +277,7 @@ class ExhumationResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn() => auth()->user()->isAdmin()),
+                        ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin()),
                 ]),
             ]);
     }
@@ -340,7 +341,7 @@ class ExhumationResource extends Resource
             }
 
             // Asignamos el usuario actual
-            $exhumation->user_id = auth()->id();
+            $exhumation->user_id = Auth::hasUser() && Auth::user() ? Auth::id() : null;
         });
     }
 
@@ -355,7 +356,7 @@ class ExhumationResource extends Resource
                 'changed_field' => 'creación',
                 'old_value' => 'Ninguno',
                 'new_value' => 'Nueva solicitud de exhumación registrada',
-                'user_id' => auth()->id(),
+                'user_id' => Auth::hasUser() && Auth::user() ? Auth::id() : null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -377,7 +378,7 @@ class ExhumationResource extends Resource
                     'changed_field' => 'estado_de_exhumación',
                     'old_value' => $oldValues['exhumation_status_id'],
                     'new_value' => $newValues['exhumation_status_id'],
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::hasUser() && Auth::user() ? Auth::id() : null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -427,7 +428,7 @@ class ExhumationResource extends Resource
                     'changed_field' => 'fecha_de_exhumación',
                     'old_value' => $oldValues['exhumation_date'] === null ? 'No definida' : $oldValues['exhumation_date'],
                     'new_value' => $newValues['exhumation_date'] === null ? 'No definida' : $newValues['exhumation_date'],
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::hasUser() && Auth::user() ? Auth::id() : null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -441,7 +442,7 @@ class ExhumationResource extends Resource
                     'changed_field' => 'motivo',
                     'old_value' => $oldValues['reason'],
                     'new_value' => $newValues['reason'],
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::hasUser() && Auth::user() ? Auth::id() : null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

@@ -10,7 +10,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ExhumationsRelationManager extends RelationManager
 {
@@ -31,7 +33,7 @@ class ExhumationsRelationManager extends RelationManager
                         $contract = $this->getOwnerRecord();
 
                         $options = \App\Models\Person::select(
-                            \DB::raw("CONCAT(first_name, ' ', last_name) AS full_name"),
+                            DB::raw("CONCAT(first_name, ' ', last_name) AS full_name"),
                             'cui'
                         )->pluck('full_name', 'cui');
 
@@ -160,7 +162,7 @@ class ExhumationsRelationManager extends RelationManager
                     ->using(function (RelationManager $livewire, array $data): mixed {
                         // Asignar contrato y usuario actual
                         $data['contract_id'] = $livewire->getOwnerRecord()->id;
-                        $data['user_id'] = auth()->id();
+                        $data['user_id'] = Auth::hasUser() && Auth::user() ? Auth::id() : null;
 
                         // Verificar que el nicho no pertenezca a un personaje histórico
                         $contract = $livewire->getOwnerRecord();
@@ -179,13 +181,13 @@ class ExhumationsRelationManager extends RelationManager
                             return false;
                         }
 
-                        return auth()->user()->isAdmin() || auth()->user()->isHelper();
+                        return Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper();
                     }),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn() => auth()->user()->isAdmin() || auth()->user()->isHelper()),
+                    ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()),
                 Tables\Actions\Action::make('downloadAgreement')
                     ->label('Descargar Acuerdo')
                     ->icon('heroicon-o-document-arrow-down')
@@ -196,7 +198,7 @@ class ExhumationsRelationManager extends RelationManager
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn() => auth()->user()->isAdmin()),
+                        ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin()),
                 ]),
             ]);
     }

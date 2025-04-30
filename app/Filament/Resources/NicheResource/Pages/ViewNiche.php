@@ -5,6 +5,7 @@ namespace App\Filament\Resources\NicheResource\Pages;
 use App\Filament\Resources\NicheResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Support\Facades\Auth;
 
 class ViewNiche extends ViewRecord
 {
@@ -14,7 +15,7 @@ class ViewNiche extends ViewRecord
     {
         return [
             Actions\EditAction::make()
-                ->visible(fn() => auth()->user()->isAdmin() || auth()->user()->isHelper()),
+                ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()),
         ];
     }
 }

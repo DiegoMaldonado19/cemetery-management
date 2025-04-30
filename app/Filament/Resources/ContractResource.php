@@ -19,6 +19,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ContractResource extends Resource
@@ -26,13 +27,13 @@ class ContractResource extends Resource
     protected static ?string $model = Contract::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
-    
+
     protected static ?string $navigationGroup = 'Gestión de Nichos';
-    
+
     protected static ?string $navigationLabel = 'Contratos';
-    
+
     protected static ?string $modelLabel = 'Contrato';
-    
+
     protected static ?string $pluralModelLabel = 'Contratos';
 
     public static function form(Form $form): Form
@@ -47,9 +48,9 @@ class ContractResource extends Resource
                                 return $query->where('niche_status_id', NicheStatus::where('name', 'Disponible')->first()?->id)
                                     ->with(['type', 'street.block.section', 'avenue.block.section']);
                             })
-                            ->getOptionLabelFromRecordUsing(fn ($record) => 
-                                $record->code . ' - ' . 
-                                $record->type->name . ' - ' . 
+                            ->getOptionLabelFromRecordUsing(fn ($record) =>
+                                $record->code . ' - ' .
+                                $record->type->name . ' - ' .
                                 'Calle ' . $record->street->street_number . ', Avenida ' . $record->avenue->avenue_number . ' - ' .
                                 $record->street->block->section->name
                             )
@@ -61,7 +62,7 @@ class ContractResource extends Resource
                                 // Formulario para crear un nuevo nicho si es necesario
                             ])
                             ->columnSpanFull(),
-                            
+
                         Forms\Components\Select::make('deceased_id')
                             ->label('Fallecido')
                             ->relationship('deceased.person', 'first_name', function (Builder $query) {
@@ -75,7 +76,7 @@ class ContractResource extends Resource
                             ->createOptionForm([
                                 // Formulario para crear un nuevo fallecido si es necesario
                             ]),
-                            
+
                         Forms\Components\Select::make('responsible_cui')
                             ->label('Responsable')
                             ->options(
@@ -85,7 +86,7 @@ class ContractResource extends Resource
                             ->searchable()
                             ->required(),
                     ]),
-                    
+
                 Forms\Components\Section::make('Fechas del Contrato')
                     ->schema([
                         Forms\Components\DatePicker::make('start_date')
@@ -93,25 +94,25 @@ class ContractResource extends Resource
                             ->required()
                             ->default(now())
                             ->disabled(fn ($record) => $record !== null),
-                            
+
                         Forms\Components\DatePicker::make('end_date')
                             ->label('Fecha de Finalización')
                             ->required()
-                            ->default(fn ($get) => 
+                            ->default(fn ($get) =>
                                 Carbon::parse($get('start_date'))->addYears(6)
                             )
                             ->beforeOrEqual('grace_date')
                             ->afterOrEqual('start_date'),
-                            
+
                         Forms\Components\DatePicker::make('grace_date')
                             ->label('Fecha de Gracia')
                             ->required()
-                            ->default(fn ($get) => 
+                            ->default(fn ($get) =>
                                 Carbon::parse($get('end_date'))->addYear()
                             )
                             ->afterOrEqual('end_date'),
                     ])->columns(3),
-                    
+
                 Forms\Components\Section::make('Estado y Notas')
                     ->schema([
                         Forms\Components\Select::make('contract_status_id')
@@ -119,7 +120,7 @@ class ContractResource extends Resource
                             ->options(ContractStatus::pluck('name', 'id'))
                             ->required()
                             ->default(fn () => ContractStatus::where('name', 'Vigente')->first()?->id),
-                            
+
                         Forms\Components\Textarea::make('notes')
                             ->label('Notas')
                             ->maxLength(65535)
@@ -135,45 +136,45 @@ class ContractResource extends Resource
                 Tables\Columns\TextColumn::make('id')
                     ->label('# Contrato')
                     ->sortable(),
-                    
+
                 Tables\Columns\TextColumn::make('niche.code')
                     ->label('Código de Nicho')
                     ->sortable()
                     ->searchable(),
-                    
+
                 Tables\Columns\TextColumn::make('deceased.person.first_name')
                     ->label('Fallecido')
-                    ->formatStateUsing(fn ($record) => 
+                    ->formatStateUsing(fn ($record) =>
                         $record->deceased->person->first_name . ' ' . $record->deceased->person->last_name
                     )
                     ->searchable(),
-                    
+
                 Tables\Columns\TextColumn::make('responsible.first_name')
                     ->label('Responsable')
-                    ->formatStateUsing(fn ($record) => 
+                    ->formatStateUsing(fn ($record) =>
                         $record->responsible->first_name . ' ' . $record->responsible->last_name
                     )
                     ->searchable(),
-                    
+
                 Tables\Columns\TextColumn::make('start_date')
                     ->label('Fecha Inicio')
                     ->date('d/m/Y')
                     ->sortable(),
-                    
+
                 Tables\Columns\TextColumn::make('end_date')
                     ->label('Fecha Fin')
                     ->date('d/m/Y')
                     ->sortable()
-                    ->description(fn ($record) => 
-                        Carbon::parse($record->end_date)->isPast() 
-                            ? 'Vencido hace ' . Carbon::parse($record->end_date)->diffForHumans() 
+                    ->description(fn ($record) =>
+                        Carbon::parse($record->end_date)->isPast()
+                            ? 'Vencido hace ' . Carbon::parse($record->end_date)->diffForHumans()
                             : 'Vence en ' . Carbon::parse($record->end_date)->diffForHumans()
                     ),
-                    
+
                 Tables\Columns\TextColumn::make('status.name')
                     ->label('Estado')
                     ->badge()
-                    ->color(fn (string $state): string => 
+                    ->color(fn (string $state): string =>
                         match ($state) {
                             'Vigente' => 'success',
                             'En Gracia' => 'warning',
@@ -182,13 +183,13 @@ class ContractResource extends Resource
                             default => 'gray',
                         }
                     ),
-                    
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Creación')
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                    
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Actualización')
                     ->dateTime('d/m/Y H:i')
@@ -199,19 +200,19 @@ class ContractResource extends Resource
                 Tables\Filters\SelectFilter::make('contract_status_id')
                     ->label('Estado')
                     ->options(ContractStatus::pluck('name', 'id')),
-                    
+
                 Tables\Filters\Filter::make('expiring_soon')
                     ->label('Próximos a vencer (90 días)')
                     ->query(function (Builder $query): Builder {
                         $today = Carbon::today();
                         $in90Days = $today->copy()->addDays(90);
-                    
+
                         return $query
                             ->where('end_date', '>=', $today)
                             ->where('end_date', '<=', $in90Days);
                     })
                     ->toggle(),
-                    
+
                 Tables\Filters\Filter::make('in_grace')
                     ->label('En período de gracia')
                     ->query(function (Builder $query): Builder {
@@ -220,7 +221,7 @@ class ContractResource extends Resource
                         });
                     })
                     ->toggle(),
-                    
+
                 Tables\Filters\Filter::make('expired')
                     ->label('Vencidos')
                     ->query(function (Builder $query): Builder {
@@ -233,7 +234,7 @@ class ContractResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn () => auth()->user()->isAdmin()),
+                    ->visible(fn () => Auth::hasUser() && Auth::user()->isAdmin()),
                 Tables\Actions\Action::make('renovate')
                     ->label('Generar Renovación')
                     ->icon('heroicon-o-currency-dollar')
@@ -247,18 +248,18 @@ class ContractResource extends Resource
                             ->where('amount', 600.00)
                             ->where('issue_date', '>', $record->payments()->latest('issue_date')->first()->issue_date ?? '1900-01-01')
                             ->first();
-                            
+
                         if ($pendingRenewal) {
                             return;
                         }
-                        
+
                         // Generar número de recibo
                         $lastReceipt = \App\Models\Payment::orderBy('id', 'desc')->first();
                         $receiptNumber = $lastReceipt ? 'REC-' . str_pad((intval(substr($lastReceipt->receipt_number, 4)) + 1), 6, '0', STR_PAD_LEFT) : 'REC-000001';
-                        
+
                         // Crear boleta de pago para renovación
                         $unpaidStatus = PaymentStatus::where('name', 'No Pagado')->first();
-                        
+
                         \App\Models\Payment::create([
                             'contract_id' => $record->id,
                             'receipt_number' => $receiptNumber,
@@ -268,9 +269,9 @@ class ContractResource extends Resource
                             'payment_status_id' => $unpaidStatus->id,
                             'receipt_file_path' => null,
                             'notes' => 'Pago de renovación de contrato',
-                            'user_id' => auth()->id(),
+                            'user_id' => Auth::hasUser() && Auth::user() ? Auth::id() : null,
                         ]);
-                        
+
                         // Registro en change_logs
                         DB::table('change_logs')->insert([
                             'table_name' => 'payments',
@@ -278,7 +279,7 @@ class ContractResource extends Resource
                             'changed_field' => 'creación',
                             'old_value' => 'Ninguno',
                             'new_value' => 'Nuevo pago de renovación registrado por monto: Q600.00',
-                            'user_id' => auth()->id(),
+                            'user_id' => Auth::hasUser() && Auth::user() ? Auth::id() : null,
                             'created_at' => now(),
                             'updated_at' => now(),
                         ]);
@@ -287,19 +288,19 @@ class ContractResource extends Resource
                     ->modalHeading('Generar boleta de renovación')
                     ->modalDescription('¿Está seguro de generar una boleta de renovación para este contrato? Se creará una boleta por Q600.00')
                     ->modalSubmitActionLabel('Sí, generar boleta')
-                    ->visible(fn (Contract $record) => 
-                        (auth()->user()->isAdmin() || auth()->user()->isHelper()) &&
+                    ->visible(fn (Contract $record) =>
+                        (Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()) &&
                         $record->status->name !== 'Finalizado'
                     ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn () => auth()->user()->isAdmin()),
+                        ->visible(fn () => Auth::hasUser() && Auth::user()->isAdmin()),
                 ]),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
@@ -308,7 +309,7 @@ class ContractResource extends Resource
             RelationManagers\NotificationsRelationManager::make(),
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -317,12 +318,12 @@ class ContractResource extends Resource
             'view' => Pages\ViewContract::route('/{record}'),
             'edit' => Pages\EditContract::route('/{record}/edit'),
         ];
-    }    
+    }
 
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with(['niche.type', 'niche.street.block.section', 'niche.avenue.block.section', 
+            ->with(['niche.type', 'niche.street.block.section', 'niche.avenue.block.section',
                     'deceased.person', 'responsible', 'status']);
     }
 
@@ -330,7 +331,7 @@ class ContractResource extends Resource
     {
         return static::getModel()::count();
     }
-    
+
     // Esta función se ejecuta antes de crear un nuevo contrato
     public static function beforeCreate(): void
     {
@@ -339,40 +340,40 @@ class ContractResource extends Resource
             if (!$contract->end_date) {
                 $contract->end_date = Carbon::parse($contract->start_date)->addYears(6);
             }
-            
+
             if (!$contract->grace_date) {
                 $contract->grace_date = Carbon::parse($contract->end_date)->addYear();
             }
-            
+
             // Si no tiene estado, establecemos "Vigente" por defecto
             if (!$contract->contract_status_id) {
                 $contract->contract_status_id = ContractStatus::where('name', 'Vigente')->first()?->id;
             }
         });
     }
-    
+
     // Esta función se ejecuta después de crear un nuevo contrato
     public static function afterCreate(): void
     {
         static::created(function (Contract $contract) {
             // Actualizamos el estado del nicho a "Ocupado"
             $occupiedStatus = NicheStatus::where('name', 'Ocupado')->first();
-            
+
             if ($occupiedStatus) {
                 Niche::where('id', $contract->niche_id)->update([
                     'niche_status_id' => $occupiedStatus->id,
                     'updated_at' => now(),
                 ]);
             }
-            
+
             // Generamos el pago inicial
             $unpaidStatus = PaymentStatus::where('name', 'No Pagado')->first();
-            
+
             if ($unpaidStatus) {
                 // Generamos número de recibo
                 $lastReceipt = \App\Models\Payment::orderBy('id', 'desc')->first();
                 $receiptNumber = $lastReceipt ? 'REC-' . str_pad((intval(substr($lastReceipt->receipt_number, 4)) + 1), 6, '0', STR_PAD_LEFT) : 'REC-000001';
-                
+
                 \App\Models\Payment::create([
                     'contract_id' => $contract->id,
                     'receipt_number' => $receiptNumber,
@@ -382,10 +383,10 @@ class ContractResource extends Resource
                     'payment_status_id' => $unpaidStatus->id,
                     'receipt_file_path' => null,
                     'notes' => 'Pago inicial del contrato',
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::hasUser() && Auth::user() ? Auth::id() : null,
                 ]);
             }
-            
+
             // Registramos la creación en el log
             DB::table('change_logs')->insert([
                 'table_name' => 'contracts',
@@ -393,7 +394,7 @@ class ContractResource extends Resource
                 'changed_field' => 'creación',
                 'old_value' => 'Ninguno',
                 'new_value' => 'Nuevo contrato creado',
-                'user_id' => auth()->id(),
+                'user_id' => Auth::hasUser() && Auth::user() ? Auth::id() : null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

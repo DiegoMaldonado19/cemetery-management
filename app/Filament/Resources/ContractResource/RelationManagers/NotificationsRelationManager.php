@@ -9,6 +9,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class NotificationsRelationManager extends RelationManager
@@ -114,19 +115,19 @@ class NotificationsRelationManager extends RelationManager
 
                         return $livewire->getRelationship()->create($data);
                     })
-                    ->visible(fn() => auth()->user()->isAdmin() || auth()->user()->isHelper()),
+                    ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn() => auth()->user()->isAdmin() || auth()->user()->isHelper()),
+                    ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()),
                 Tables\Actions\DeleteAction::make()
-                    ->visible(fn() => auth()->user()->isAdmin()),
+                    ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn() => auth()->user()->isAdmin()),
+                        ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin()),
                 ]),
             ]);
     }
