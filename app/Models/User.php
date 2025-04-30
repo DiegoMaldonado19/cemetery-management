@@ -14,7 +14,7 @@ class User extends Authenticatable implements FilamentUser
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $primaryKey = 'id';
-    
+
     protected $fillable = [
         'name',
         'email',
@@ -68,21 +68,21 @@ class User extends Authenticatable implements FilamentUser
 
     public function isAdmin(): bool
     {
-        return $this->role->name === 'Administrador';
+        return $this->role && $this->role->name === 'Administrador';
     }
 
     public function isHelper(): bool
     {
-        return $this->role->name === 'Ayudante';
+        return $this->role && $this->role->name === 'Ayudante';
     }
 
     public function isAuditor(): bool
     {
-        return $this->role->name === 'Auditor';
+        return $this->role && $this->role->name === 'Auditor';
     }
 
     public function isConsultationUser(): bool
     {
-        return $this->role->name === 'Usuario de Consulta';
+        return $this->role && $this->role->name === 'Usuario de Consulta';
     }
 }

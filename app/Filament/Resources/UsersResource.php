@@ -166,12 +166,12 @@ class UserResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn() => auth()->user()->isAdmin()),
+                    ->visible(fn() => auth()->user() && auth()->user()->role && auth()->user()->role->name === 'Administrador'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn() => auth()->user()->isAdmin()),
+                        ->visible(fn() => auth()->user() && auth()->user()->role && auth()->user()->role->name === 'Administrador'),
                 ]),
             ]);
     }
@@ -202,6 +202,6 @@ class UserResource extends Resource
     // Solo los administradores pueden acceder a la gestión de usuarios
     public static function canAccess(): bool
     {
-        return auth()->user()->isAdmin() || auth()->user()->isAuditor();
+        return auth()->user() && auth()->user()->role && (auth()->user()->role->name === 'Administrador' || auth()->user()->role->name === 'Auditor');
     }
 }
