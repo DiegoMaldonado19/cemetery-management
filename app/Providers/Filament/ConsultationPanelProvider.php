@@ -60,7 +60,7 @@ class ConsultationPanelProvider extends PanelProvider
                 TrackUserLastLogin::class,
                 CheckUserRole::class.':consultation', // Asegura que solo usuarios de consulta puedan acceder
             ])
-            ->databaseNotifications()
+            //->databaseNotifications()
             ->profile()
             ->favicon(asset('images/favicon.png'));
     }

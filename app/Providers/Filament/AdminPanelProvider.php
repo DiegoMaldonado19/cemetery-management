@@ -60,7 +60,7 @@ class AdminPanelProvider extends PanelProvider
                 TrackUserLastLogin::class,
                 CheckUserRole::class.':admin', // Asegura que solo usuarios administrativos puedan acceder
             ])
-            ->databaseNotifications()
+            //->databaseNotifications()
             ->navigationGroups([
                 'Gestión de Nichos',
                 'Personas y Usuarios',

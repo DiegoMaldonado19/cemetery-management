@@ -33,6 +33,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Notifications
+    |--------------------------------------------------------------------------
+    |
+    | This is the configuration for the Filament notifications system.
+    | The 'database' section configures where notifications will be stored.
+    |
+    */
+
+    'notifications' => [
+        'database' => [
+            'table' => 'filament_notifications',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Filesystem Disk
     |--------------------------------------------------------------------------
     |
