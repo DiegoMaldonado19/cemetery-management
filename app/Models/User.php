@@ -63,7 +63,29 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->is_active && $this->role->name !== 'Usuario de Consulta';
+        // Si no está activo, no puede acceder a ningún panel
+        if (!$this->is_active) {
+            return false;
+        }
+
+        // Si no tiene rol asignado, no puede acceder
+        if (!$this->role) {
+            return false;
+        }
+
+        // Verificar según el panel solicitado
+        if ($panel->getId() === 'admin') {
+            // Solo admin, ayudante y auditor pueden acceder al panel admin
+            return in_array($this->role->name, ['Administrador', 'Ayudante', 'Auditor']);
+        }
+
+        if ($panel->getId() === 'consultation') {
+            // Solo usuario de consulta puede acceder al panel de consulta
+            return $this->role->name === 'Usuario de Consulta';
+        }
+
+        // Para cualquier otro panel, denegar acceso por defecto
+        return false;
     }
 
     public function isAdmin(): bool

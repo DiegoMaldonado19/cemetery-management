@@ -17,32 +17,32 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use App\Filament\Pages\Dashboard;
+use App\Filament\Consultation\Pages\Dashboard;
 use App\Http\Middleware\TrackUserLastLogin;
 use App\Http\Middleware\CheckUserRole;
 
-class AdminPanelProvider extends PanelProvider
+class ConsultationPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
-            ->id('admin')
-            ->path('admin')
+            ->id('consultation')
+            ->path('consulta')
             ->login()
-            ->brandName('Cementerio General')
+            ->tenant('App\Models\User')  // Agregamos tenant para evitar problemas de rutas
+            ->tenantRoutePrefix('consulta')
+            ->brandName('Consulta de Nichos - Cementerio General')
             ->colors([
                 'primary' => Color::Amber,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->discoverResources(in: app_path('Filament/Consultation/Resources'), for: 'App\\Filament\\Consultation\\Resources')
+            ->discoverPages(in: app_path('Filament/Consultation/Pages'), for: 'App\\Filament\\Consultation\\Pages')
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Consultation/Widgets'), for: 'App\\Filament\\Consultation\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                //Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -58,14 +58,9 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
                 TrackUserLastLogin::class,
-                CheckUserRole::class.':admin', // Asegura que solo usuarios administrativos puedan acceder
+                CheckUserRole::class.':consultation', // Asegura que solo usuarios de consulta puedan acceder
             ])
             ->databaseNotifications()
-            ->navigationGroups([
-                'Gestión de Nichos',
-                'Personas y Usuarios',
-                'Configuración',
-            ])
             ->profile()
             ->favicon(asset('images/favicon.png'));
     }
