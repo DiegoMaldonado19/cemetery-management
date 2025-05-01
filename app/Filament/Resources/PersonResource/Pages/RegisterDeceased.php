@@ -71,7 +71,7 @@ class RegisterDeceased extends Page
         return [
             Action::make('save')
                 ->label('Guardar')
-                ->submit('save'),
+                ->action('save'),
         ];
     }
 
