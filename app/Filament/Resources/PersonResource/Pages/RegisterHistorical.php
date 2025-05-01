@@ -61,7 +61,7 @@ class RegisterHistorical extends Page
         return [
             Action::make('save')
                 ->label('Guardar')
-                ->submit('save'),
+                ->action('save'),
         ];
     }
 

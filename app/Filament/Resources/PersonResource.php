@@ -197,4 +197,17 @@ class PersonResource extends Resource
     {
         return static::getModel()::count();
     }
+
+    public static function afterCreate(Person $record, array $data): void
+    {
+        if (isset($data['address_line']) && !empty($data['address_line'])) {
+            $record->addresses()->create([
+                'cui' => $record->cui,
+                'department_id' => $data['department_id'] ?? 1,
+                'address_line' => $data['address_line'],
+                'reference' => $data['reference'] ?? null,
+                'is_primary' => true,
+            ]);
+        }
+    }
 }
