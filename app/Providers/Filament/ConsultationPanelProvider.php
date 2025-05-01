@@ -29,8 +29,6 @@ class ConsultationPanelProvider extends PanelProvider
             ->id('consultation')
             ->path('consulta')
             ->login()
-            ->tenant('App\Models\User')  // Agregamos tenant para evitar problemas de rutas
-            ->tenantRoutePrefix('consulta')
             ->brandName('Consulta de Nichos - Cementerio General')
             ->colors([
                 'primary' => Color::Amber,

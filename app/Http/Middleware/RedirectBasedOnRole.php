@@ -25,7 +25,7 @@ class RedirectBasedOnRole
         ]);
 
         // Si el usuario no está autenticado y está intentando acceder a la raíz,
-        // redirigirlo al login de Filament (no al login personalizado)
+        // redirigirlo al login de Filament
         if (!Auth::hasUser() && $request->is('/')) {
             Log::info('Redirigiendo usuario no autenticado a la página de login');
             return redirect('/admin/login');
