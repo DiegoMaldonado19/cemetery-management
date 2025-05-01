@@ -56,9 +56,8 @@ class ConsultationPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
                 TrackUserLastLogin::class,
-                CheckUserRole::class.':consultation', // Asegura que solo usuarios de consulta puedan acceder
+                CheckUserRole::class.':consultation',
             ])
-            //->databaseNotifications()
             ->profile()
             ->favicon(asset('images/favicon.png'));
     }
