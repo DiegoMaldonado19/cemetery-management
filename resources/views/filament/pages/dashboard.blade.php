@@ -51,7 +51,7 @@
                     </table>
                 </div>
                 <div class="mt-4 text-right">
-                    <a href="{{ route('filament.admin.resources.contracts.index', ['tableFilters[expiring_soon][isActive]' => 'true']) }}" class="text-primary-600 hover:text-primary-900 text-sm font-medium">
+                    <a href="{{ route('filament.admin.resources.contracts.index') }}?tableFilters[expiring_soon][isActive]=true" class="text-primary-600 hover:text-primary-900 text-sm font-medium">
                         Ver todos los contratos próximos a vencer →
                     </a>
                 </div>
@@ -108,7 +108,7 @@
                     </table>
                 </div>
                 <div class="mt-4 text-right">
-                    <a href="{{ route('filament.admin.resources.payments.index', ['tableFilters[payment_status_id][value]' => 2]) }}" class="text-primary-600 hover:text-primary-900 text-sm font-medium">
+                    <a href="{{ route('filament.admin.resources.payments.index') }}?tableFilters[payment_status_id][value]=2" class="text-primary-600 hover:text-primary-900 text-sm font-medium">
                         Ver todos los pagos pendientes →
                     </a>
                 </div>
@@ -169,7 +169,7 @@
                 </table>
             </div>
             <div class="mt-4 text-right">
-                <a href="{{ route('filament.admin.resources.exhumations.index', ['tableFilters[exhumation_status_id][value]' => 1]) }}" class="text-primary-600 hover:text-primary-900 text-sm font-medium">
+                <a href="{{ route('filament.admin.resources.exhumations.index') }}?tableFilters[exhumation_status_id][value]=1" class="text-primary-600 hover:text-primary-900 text-sm font-medium">
                     Ver todas las solicitudes de exhumación →
                 </a>
             </div>

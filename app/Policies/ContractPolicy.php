@@ -13,7 +13,7 @@ class ContractPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->isAdmin() || $user->isHelper() || $user->isAuditor();
     }
 
     /**
@@ -21,7 +21,7 @@ class ContractPolicy
      */
     public function view(User $user, Contract $contract): bool
     {
-        return false;
+        return $user->isAdmin() || $user->isHelper() || $user->isAuditor();
     }
 
     /**
@@ -29,7 +29,7 @@ class ContractPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->isAdmin() || $user->isHelper();
     }
 
     /**
@@ -37,7 +37,7 @@ class ContractPolicy
      */
     public function update(User $user, Contract $contract): bool
     {
-        return false;
+        return $user->isAdmin() || $user->isHelper();
     }
 
     /**
@@ -45,7 +45,7 @@ class ContractPolicy
      */
     public function delete(User $user, Contract $contract): bool
     {
-        return false;
+        return $user->isAdmin() || $user->isHelper();
     }
 
     /**
@@ -53,7 +53,7 @@ class ContractPolicy
      */
     public function restore(User $user, Contract $contract): bool
     {
-        return false;
+        return $user->isAdmin() || $user->isHelper();
     }
 
     /**
@@ -61,6 +61,6 @@ class ContractPolicy
      */
     public function forceDelete(User $user, Contract $contract): bool
     {
-        return false;
+        return $user->isAdmin() || $user->isHelper();
     }
 }
