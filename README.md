@@ -180,7 +180,7 @@ Para contribuir al proyecto:
 
 ## License
 
-This project is licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Este proyecto se encuentar licenciado bajo [MIT license](https://opensource.org/licenses/MIT).
 
 ## Author
 
