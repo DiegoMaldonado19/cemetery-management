@@ -178,11 +178,11 @@ Para contribuir al proyecto:
 2. Realizar cambios y tests
 3. Enviar pull request para revisión
 
-## License
+## Licencia
 
 Este proyecto se encuentar licenciado bajo [MIT license](https://opensource.org/licenses/MIT).
 
-## Author
+## Autor
 
 -   #### Diego José Maldonado Monterroso.
 -   #### Carné: 201931811.
