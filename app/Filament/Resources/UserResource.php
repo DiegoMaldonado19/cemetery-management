@@ -200,9 +200,10 @@ class UserResource extends Resource
             ->with(['person', 'role']);
     }
 
-    // Solo los administradores pueden acceder a la gestión de usuarios
+    // Solo los administradores y auditores pueden acceder a la gestión de usuarios
     public static function canAccess(): bool
     {
-        return Auth::hasUser() && Auth::user() && Auth::user()->role && (Auth::user()->role->name === 'Administrador' || Auth::user()->role->name === 'Auditor');
+        return Auth::hasUser() && Auth::user() && Auth::user()->role &&
+               (Auth::user()->role->name === 'Administrador' || Auth::user()->role->name === 'Auditor');
     }
 }

@@ -139,14 +139,14 @@ class PersonResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn () => Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()),
+                    ->visible(fn () => Auth::hasUser() && (Auth::user()->isAdmin() || Auth::user()->isHelper())),
                 Tables\Actions\Action::make('registerDeceased')
                     ->label('Registrar Fallecimiento')
                     ->icon('heroicon-o-document-plus')
                     ->color('danger')
                     ->url(fn (Person $record) => route('filament.admin.resources.people.deceased.create', $record))
                     ->visible(fn (Person $record) =>
-                        (Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()) &&
+                        (Auth::hasUser() && (Auth::user()->isAdmin() || Auth::user()->isHelper())) &&
                         $record->deceased === null
                     ),
                 Tables\Actions\Action::make('registerHistorical')

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\NicheResource\Pages;
 use App\Filament\Resources\NicheResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Support\Facades\Auth;
 
 class ListNiches extends ListRecords
 {
@@ -13,7 +14,8 @@ class ListNiches extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->visible(fn () => Auth::hasUser() && (Auth::user()->isAdmin() || Auth::user()->isHelper())),
         ];
     }
 }

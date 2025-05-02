@@ -38,6 +38,12 @@
                                             class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
                                             Ver detalles
                                         </a>
+                                        @if(Auth::hasUser() && (Auth::user()->isAdmin() || Auth::user()->isHelper()))
+                                            <a href="{{ route('filament.admin.resources.contracts.edit', $contract) }}"
+                                               class="ml-2 text-amber-600 hover:text-amber-900 dark:text-amber-400 dark:hover:text-amber-300">
+                                                Renovar
+                                            </a>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -89,6 +95,12 @@
                                             class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
                                             Ver detalles
                                         </a>
+                                        @if(Auth::hasUser() && (Auth::user()->isAdmin() || Auth::user()->isHelper()))
+                                            <a href="{{ route('filament.admin.resources.payments.edit', $payment) }}"
+                                               class="ml-2 text-amber-600 hover:text-amber-900 dark:text-amber-400 dark:hover:text-amber-300">
+                                                Procesar
+                                            </a>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -131,6 +143,7 @@
                             <tr class="bg-white dark:bg-gray-900 border-b hover:bg-gray-50 dark:hover:bg-gray-800 dark:border-gray-700">
                                 <td class="px-4 py-2 font-medium dark:text-gray-300">{{ $exhumation->id }}</td>
                                 <td class="px-4 py-2 dark:text-gray-300">{{ $exhumation->contract->niche->code }}</td>
+                                <td class="px-4 py-2 dark:text-gray-300">{{ $exhumation->contract->niche->code }}</td>
                                 <td class="px-4 py-2 dark:text-gray-300">{{ $exhumation->contract->deceased->person->first_name }} {{ $exhumation->contract->deceased->person->last_name }}</td>
                                 <td class="px-4 py-2 dark:text-gray-300">{{ $exhumation->requester->first_name }} {{ $exhumation->requester->last_name }}</td>
                                 <td class="px-4 py-2 dark:text-gray-300">
@@ -143,6 +156,12 @@
                                         class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
                                         Ver detalles
                                     </a>
+                                    @if(Auth::hasUser() && (Auth::user()->isAdmin() || Auth::user()->isHelper()))
+                                        <a href="{{ route('filament.admin.resources.exhumations.edit', $exhumation) }}"
+                                           class="ml-2 text-amber-600 hover:text-amber-900 dark:text-amber-400 dark:hover:text-amber-300">
+                                            Procesar
+                                        </a>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
@@ -229,6 +248,16 @@
                 >
                     Ver página completa
                 </x-filament::button>
+
+                @if(Auth::hasUser() && (Auth::user()->isAdmin() || Auth::user()->isHelper()))
+                    <x-filament::button
+                        color="success"
+                        tag="a"
+                        href="{{ route('filament.admin.resources.contracts.edit', $contract) }}"
+                    >
+                        Renovar Contrato
+                    </x-filament::button>
+                @endif
             </x-slot>
         </x-filament::modal>
     @endforeach
@@ -306,6 +335,16 @@
                 >
                     Ver página completa
                 </x-filament::button>
+
+                @if(Auth::hasUser() && (Auth::user()->isAdmin() || Auth::user()->isHelper()))
+                    <x-filament::button
+                        color="success"
+                        tag="a"
+                        href="{{ route('filament.admin.resources.payments.edit', $payment) }}"
+                    >
+                        Procesar Pago
+                    </x-filament::button>
+                @endif
             </x-slot>
         </x-filament::modal>
     @endforeach
@@ -389,6 +428,16 @@
                 >
                     Ver página completa
                 </x-filament::button>
+
+                @if(Auth::hasUser() && (Auth::user()->isAdmin() || Auth::user()->isHelper()))
+                    <x-filament::button
+                        color="success"
+                        tag="a"
+                        href="{{ route('filament.admin.resources.exhumations.edit', $exhumation) }}"
+                    >
+                        Procesar Solicitud
+                    </x-filament::button>
+                @endif
             </x-slot>
         </x-filament::modal>
     @endforeach

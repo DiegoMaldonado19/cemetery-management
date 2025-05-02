@@ -266,7 +266,7 @@ class ExhumationResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn() => Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()),
+                    ->visible(fn() => Auth::hasUser() && (Auth::user()->isAdmin() || Auth::user()->isHelper())),
                 Tables\Actions\Action::make('downloadAgreement')
                     ->label('Descargar Acuerdo')
                     ->icon('heroicon-o-document-arrow-down')

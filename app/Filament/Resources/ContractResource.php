@@ -289,7 +289,7 @@ class ContractResource extends Resource
                     ->modalDescription('¿Está seguro de generar una boleta de renovación para este contrato? Se creará una boleta por Q600.00')
                     ->modalSubmitActionLabel('Sí, generar boleta')
                     ->visible(fn (Contract $record) =>
-                        (Auth::hasUser() && Auth::user()->isAdmin() || Auth::hasUser() && Auth::user()->isHelper()) &&
+                        (Auth::hasUser() && (Auth::user()->isAdmin() || Auth::user()->isHelper())) &&
                         $record->status->name !== 'Finalizado'
                     ),
             ])
