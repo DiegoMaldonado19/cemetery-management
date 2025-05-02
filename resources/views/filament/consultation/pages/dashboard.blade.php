@@ -53,7 +53,47 @@
                         <x-slot name="heading">Búsqueda de Nichos</x-slot>
 
                         <form wire:submit="search">
-                            {{ $this->searchForm }}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
+                                    <h3 class="text-lg font-medium mb-2 text-gray-900 dark:text-gray-100">Búsqueda por código o nombre</h3>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label for="nicheCode" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Código de Nicho</label>
+                                            <input type="text" id="nicheCode" wire:model="nicheCode" placeholder="Ejemplo: N-001" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Ingrese el código exacto del nicho que desea consultar</p>
+                                        </div>
+                                        <div>
+                                            <label for="deceasedName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre del Fallecido</label>
+                                            <input type="text" id="deceasedName" wire:model="deceasedName" placeholder="Ejemplo: Juan Pérez" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Ingrese el nombre o apellido del fallecido</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
+                                    <h3 class="text-lg font-medium mb-2 text-gray-900 dark:text-gray-100">Búsqueda por ubicación</h3>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label for="street_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Calle</label>
+                                            <select id="street_id" wire:model="street_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                                <option value="">Seleccione una calle</option>
+                                                @foreach(App\Models\CemeteryStreet::all() as $street)
+                                                    <option value="{{ $street->id }}">Calle {{ $street->street_number }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="avenue_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Avenida</label>
+                                            <select id="avenue_id" wire:model="avenue_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                                <option value="">Seleccione una avenida</option>
+                                                @foreach(App\Models\CemeteryAvenue::all() as $avenue)
+                                                    <option value="{{ $avenue->id }}">Avenida {{ $avenue->avenue_number }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             <div class="mt-4 flex justify-end">
                                 <x-filament::button type="submit">
@@ -145,6 +185,7 @@
                     </x-filament::section>
                 </div>
 
+                <!-- El resto del código permanece igual -->
                 <!-- Pestaña de mis contratos -->
                 <div x-show="activeTab === 'contracts'" x-transition>
                     <x-filament::section>
@@ -245,7 +286,7 @@
 
                         <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                             Utilice este formulario para solicitar una boleta de pago para renovación de contrato.
-                            Un administrador procesará su solicitud y generará la boleta correspondiente.
+                            Un administrador procesará su solicitud y generará la boleta correspondiente, la cual será enviada por medio de correo electronico.
                         </p>
 
                         <form wire:submit="requestPayment">
