@@ -1,61 +1,189 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistema de Gestión de Cementerio General
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Este proyecto implementa un sistema de gestión completo para el Cementerio General de Quetzaltenango, permitiendo la administración de nichos, contratos, pagos, exhumaciones y personajes históricos mediante dos paneles de usuario: uno administrativo y otro de consulta.
 
-## About Laravel
+## Tecnologías Utilizadas
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+-   **PHP**: 8.2.x
+-   **Laravel**: 12.0
+-   **Filament**: 3.3.x - Framework de administración para Laravel
+-   **MariaDB**: 10.4.32 - Sistema de gestión de base de datos
+-   **XAMPP**: v3.3.0 - Entorno de desarrollo local
+-   **Composer**: 2.6.x - Gestor de dependencias de PHP
+-   **Tailwind CSS**: 4.x - Framework CSS para el diseño
+-   **Vite**: 6.2.x - Herramienta de compilación de frontend
+-   **Alpine.js**: Integrado con Filament - Framework JS para interactividad
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requisitos del Sistema
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+-   PHP 8.2 o superior
+-   Composer 2.6.x o superior
+-   Node.js 20.x y NPM 10.x
+-   XAMPP 3.3.0 o superior con MariaDB 10.4.x
+-   Espacio en disco: Mínimo 500MB
 
-## Learning Laravel
+## Instalación
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 1. Preparar el entorno de desarrollo
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+1. Instalar XAMPP 3.3.0 desde [xampp-windows.org](https://www.apachefriends.org/download.html)
+2. Iniciar los servicios de Apache y MySQL desde XAMPP Control Panel
+3. Instalar Composer desde [getcomposer.org](https://getcomposer.org/download/)
+4. Instalar Node.js desde [nodejs.org](https://nodejs.org/)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. Configurar la base de datos
 
-## Laravel Sponsors
+1. Abrir phpMyAdmin: http://localhost/phpmyadmin/
+2. Crear una nueva base de datos llamada `cemetery_management`
+3. Establecer collation como `utf8mb4_unicode_ci`
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 3. Clonar e instalar el proyecto
 
-### Premium Partners
+```bash
+# Clonar el repositorio
+git clone [url-del-repositorio] cemetery-management
+cd cemetery-management
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development/)**
-- **[Active Logic](https://activelogic.com)**
+# Instalar dependencias PHP
+composer install
 
-## Contributing
+# Instalar dependencias JavaScript
+npm install
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# Copiar el archivo de configuración
+cp .env.example .env
 
-## Code of Conduct
+# Generar clave de aplicación
+php artisan key:generate
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Configurar .env con credenciales de base de datos
+# DB_CONNECTION=mysql
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=cemetery_management
+# DB_USERNAME=root
+# DB_PASSWORD=
 
-## Security Vulnerabilities
+# Ejecutar migraciones y seeders
+php artisan migrate --seed
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Compilar assets
+npm run build
+
+# Iniciar el servidor de desarrollo
+php artisan serve
+```
+
+## Estructura del Proyecto
+
+El proyecto sigue la estructura estándar de Laravel con adiciones específicas para el panel de administración Filament:
+
+```
+app/
+  ├── Console/Commands/           # Comandos personalizados (ej: actualización de estados)
+  ├── Filament/                   # Componentes del panel Filament
+  │   ├── Consultation/           # Panel de consulta pública
+  │   │   └── Pages/              # Páginas del panel de consulta
+  │   ├── Pages/                  # Páginas del panel administrativo
+  │   ├── Resources/              # Recursos del panel administrativo (CRUD)
+  │   └── Widgets/                # Widgets para dashboards
+  ├── Http/
+  │   ├── Controllers/            # Controladores de la aplicación
+  │   └── Middleware/             # Middlewares personalizados
+  ├── Models/                     # Modelos Eloquent
+  ├── Observers/                  # Observadores de modelos
+  └── Policies/                   # Políticas de autorización
+
+bootstrap/                        # Archivos de arranque de Laravel
+config/                           # Archivos de configuración
+database/                         # Migraciones y seeders
+public/                           # Archivos públicos (CSS, JS compilados)
+resources/                        # Recursos (vistas, assets sin compilar)
+routes/                           # Definición de rutas
+```
+
+## Arquitectura del Sistema
+
+### Modelos y Relaciones
+
+El sistema se basa en varios modelos interrelacionados:
+
+-   **Niche**: Representa un nicho en el cementerio con ubicación específica
+-   **Contract**: Gestiona contratos de nichos vinculando personas (fallecidos y responsables)
+-   **Person**: Almacena información de personas (tanto fallecidos como responsables)
+-   **Deceased**: Contiene información específica de personas fallecidas
+-   **Payment**: Administra pagos asociados a contratos
+-   **Exhumation**: Gestiona solicitudes y procesos de exhumación
+-   **HistoricalFigure**: Identifica personajes históricos con protección especial
+
+### Middleware y Autenticación
+
+El sistema implementa un sistema de control de acceso basado en roles mediante middlewares personalizados:
+
+-   **CheckUserRole**: Verifica el rol del usuario y restringe el acceso según el panel
+-   **RedirectBasedOnRole**: Redirige a los usuarios al panel correspondiente según su rol
+-   **TrackUserLastLogin**: Registra la última vez que un usuario ingresó al sistema
+
+Los roles disponibles son:
+
+1. **Administrador**: Acceso completo a todas las funcionalidades
+2. **Ayudante**: Acceso restringido al panel administrativo
+3. **Auditor**: Acceso de solo lectura al panel administrativo
+4. **Usuario de Consulta**: Acceso únicamente al panel de consulta
+
+### Rutas y Navegación
+
+El sistema utiliza principalmente dos rutas principales:
+
+1. **/admin**: Panel administrativo para la gestión completa del cementerio
+
+    - Acceso restringido a roles Administrador, Ayudante y Auditor
+    - Incluye gestión completa de nichos, contratos, pagos, exhumaciones
+
+2. **/consulta**: Panel de consulta para usuarios finales
+    - Acceso para usuarios con rol "Usuario de Consulta"
+    - Permite realizar búsquedas de nichos, ver contratos propios, solicitar pagos y exhumaciones
+
+La ruta raíz (/) implementa redirección inteligente según el rol del usuario autenticado.
+
+## Funcionalidades Principales
+
+### Panel Administrativo
+
+-   Gestión completa de nichos, contratos, pagos y exhumaciones
+-   Reportes y estadísticas en dashboard
+-   Gestión de personajes históricos
+-   Procesamiento de pagos y solicitudes de exhumación
+-   Actualización automática de estados de contratos
+
+### Panel de Consulta
+
+-   Búsqueda de nichos por código, nombre de fallecido o ubicación
+-   Visualización de contratos asociados al usuario
+-   Solicitud de boletas de pago para renovación
+-   Solicitud de exhumaciones
+
+## Comandos Personalizados
+
+El sistema implementa varios comandos Artisan personalizados:
+
+-   `php artisan app:create-admin-user`: Crea un usuario administrador con un registro de persona
+-   `php artisan app:update-contract-statuses`: Actualiza automáticamente los estados de contratos basado en fechas
+
+## Contribución
+
+Para contribuir al proyecto:
+
+1. Crear una rama para la nueva funcionalidad (`git checkout -b feature/nueva-funcionalidad`)
+2. Realizar cambios y tests
+3. Enviar pull request para revisión
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Author
+
+-   #### Diego José Maldonado Monterroso.
+-   #### Carné: 201931811.
+-   #### Date: November 2024.
