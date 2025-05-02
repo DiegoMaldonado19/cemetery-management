@@ -41,11 +41,19 @@ class DeceasedResource extends Resource
                             ->schema([
                                 Forms\Components\Select::make('cui')
                                     ->label('Persona')
-                                    ->options(Person::select(DB::raw("CONCAT(first_name, ' ', last_name, ' (', cui, ')') AS full_name"), 'cui')
-                                    ->whereNotIn('cui', function ($query) {
-                                        $query->select('cui')->from('deceased');
+                                    ->options(function () {
+                                        // Asegúrate de que estos namespaces estén importados al principio del archivo
+                                        // use App\Models\Person;
+                                        // use Illuminate\Support\Facades\DB;
+
+                                        return Person::whereNotIn('cui', function ($query) {
+                                                $query->select('cui')->from('deceased');
+                                            })
+                                            ->get()
+                                            ->mapWithKeys(function ($person) {
+                                                return [$person->cui => "{$person->first_name} {$person->last_name} ({$person->cui})"];
+                                            });
                                     })
-                                    ->pluck('full_name', 'cui'))
                                     ->searchable()
                                     ->preload()
                                     ->reactive()

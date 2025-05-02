@@ -52,10 +52,19 @@ class UserResource extends Resource
 
                         Forms\Components\Select::make('cui')
                             ->label('Persona Asociada')
-                            ->options(
-                                Person::select(DB::raw("CONCAT(first_name, ' ', last_name, ' (', cui, ')') AS full_name"), 'cui')
-                                    ->pluck('full_name', 'cui')
-                            )
+                            ->options(function () {
+                                // Asegúrate de que estos namespaces estén importados al principio del archivo
+                                // use App\Models\Person;
+                                // use Illuminate\Support\Facades\DB;
+
+                                return Person::whereNotIn('cui', function ($query) {
+                                        $query->select('cui')->from('deceased');
+                                    })
+                                    ->get()
+                                    ->mapWithKeys(function ($person) {
+                                        return [$person->cui => "{$person->first_name} {$person->last_name} ({$person->cui})"];
+                                    });
+                            })
                             ->searchable()
                             ->required(),
 
