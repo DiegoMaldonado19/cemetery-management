@@ -3,7 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CemeteryBlockResource\Pages;
-use App\Filament\Resources\CemeteryBlockResource\RelationManagers;
+use App\Filament\Resources\CemeterySectionResource\RelationManagers;
 use App\Models\CemeteryBlock;
 use App\Models\CemeterySection;
 use Filament\Forms;

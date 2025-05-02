@@ -42,10 +42,10 @@ class DeceasedResource extends Resource
                                 Forms\Components\Select::make('cui')
                                     ->label('Persona')
                                     ->options(Person::select(DB::raw("CONCAT(first_name, ' ', last_name, ' (', cui, ')') AS full_name"), 'cui')
-                                        ->whereNotIn('cui', function ($query) {
-                                            $query->select('cui')->from('deceased');
-                                        })
-                                        ->pluck('full_name', 'cui'))
+                                    ->whereNotIn('cui', function ($query) {
+                                        $query->select('cui')->from('deceased');
+                                    })
+                                    ->pluck('full_name', 'cui'))
                                     ->searchable()
                                     ->preload()
                                     ->reactive()

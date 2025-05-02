@@ -89,11 +89,22 @@ class ContractResource extends Resource
                                 // Formulario para crear un nuevo fallecido si es necesario
                             ]),
 
-                        Forms\Components\Select::make('responsible_cui')
+                            Forms\Components\Select::make('responsible_cui')
                             ->label('Responsable')
                             ->options(function () {
-                                return Person::select(DB::raw("CONCAT(first_name, ' ', last_name, ' (', cui, ')') AS full_name"), 'cui')
-                                    ->pluck('full_name', 'cui');
+                                // Importar la clase Person si no está en el mismo namespace
+                                // use App\Models\Person;
+
+                                // Asegurarnos de usar el namespace correcto para DB
+                                // use Illuminate\Support\Facades\DB;
+
+                                return Person::whereNotIn('cui', function ($query) {
+                                        $query->select('cui')->from('deceased');
+                                    })
+                                    ->get()
+                                    ->mapWithKeys(function ($person) {
+                                        return [$person->cui => "{$person->first_name} {$person->last_name} ({$person->cui})"];
+                                    });
                             })
                             ->searchable()
                             ->required(),

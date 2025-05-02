@@ -37,12 +37,18 @@ class ContractsRelationManager extends RelationManager
                     ->searchable()
                     ->preload()
                     ->required(),
-                Forms\Components\Select::make('responsible_cui')
+                    Forms\Components\Select::make('responsible_cui')
                     ->label('Responsable')
-                    ->options(Person::pluck(
-                        DB::raw("CONCAT(first_name, ' ', last_name)"),
-                        'cui'
-                    ))
+                    ->options(function () {
+                        // Filtrar personas vivas (que no estén en la tabla deceased)
+                        return Person::whereNotIn('cui', function ($query) {
+                                $query->select('cui')->from('deceased');
+                            })
+                            ->get()
+                            ->mapWithKeys(function ($person) {
+                                return [$person->cui => "{$person->first_name} {$person->last_name} ({$person->cui})"];
+                            });
+                    })
                     ->searchable()
                     ->preload()
                     ->required(),

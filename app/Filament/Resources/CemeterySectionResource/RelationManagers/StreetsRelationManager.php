@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\CemeteryBlockResource\RelationManagers;
+namespace App\Filament\Resources\CemeterySectionResource\RelationManagers;
 
 use App\Models\CemeteryStreet;
 use Filament\Forms;
