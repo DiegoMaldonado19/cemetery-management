@@ -186,4 +186,4 @@ Este proyecto se encuentar licenciado bajo [MIT license](https://opensource.org/
 
 -   #### Diego José Maldonado Monterroso.
 -   #### Carné: 201931811.
--   #### Date: November 2024.
+-   #### Fecha: jueves 02 de Mayo de 2025.
