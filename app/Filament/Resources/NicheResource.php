@@ -7,6 +7,8 @@ use App\Filament\Resources\NicheResource\RelationManagers;
 use App\Models\Niche;
 use App\Models\NicheStatus;
 use App\Models\NicheType;
+use App\Models\CemeteryStreet;
+use App\Models\CemeteryAvenue;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -57,18 +59,28 @@ class NicheResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('street_id')
                             ->label('Calle')
-                            ->relationship('street', 'name', function (Builder $query) {
-                                return $query->with('block.section');
+                            ->options(function () {
+                                return CemeteryStreet::with('block.section')
+                                    ->get()
+                                    ->mapWithKeys(function ($street) {
+                                        return [
+                                            $street->id => $street->block->section->name . ' - Bloque ' . $street->block->name . ', Calle ' . $street->street_number
+                                        ];
+                                    });
                             })
-                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->block->section->name . ' - ' . $record->block->name . ', Calle ' . $record->street_number)
                             ->required()
                             ->searchable(),
                         Forms\Components\Select::make('avenue_id')
                             ->label('Avenida')
-                            ->relationship('avenue', 'name', function (Builder $query) {
-                                return $query->with('block.section');
+                            ->options(function () {
+                                return CemeteryAvenue::with('block.section')
+                                    ->get()
+                                    ->mapWithKeys(function ($avenue) {
+                                        return [
+                                            $avenue->id => $avenue->block->section->name . ' - Bloque ' . $avenue->block->name . ', Avenida ' . $avenue->avenue_number
+                                        ];
+                                    });
                             })
-                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->block->section->name . ' - ' . $record->block->name . ', Avenida ' . $record->avenue_number)
                             ->required()
                             ->searchable(),
                         Forms\Components\Textarea::make('location_reference')
@@ -96,6 +108,7 @@ class NicheResource extends Resource
                     ]),
             ]);
     }
+
 
     public static function table(Table $table): Table
     {

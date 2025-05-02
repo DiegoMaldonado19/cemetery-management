@@ -6,6 +6,8 @@ use App\Filament\Resources\DeceasedResource\Pages;
 use App\Models\Deceased;
 use App\Models\DeathCause;
 use App\Models\Person;
+use App\Models\Department;
+use App\Models\Gender;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -33,29 +35,101 @@ class DeceasedResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('cui')
-                    ->label('Persona')
-                    ->options(Person::select(DB::raw("CONCAT(first_name, ' ', last_name, ' (', cui, ')') AS full_name"), 'cui')
-                        ->whereNotIn('cui', function ($query) {
-                            $query->select('cui')->from('deceased');
-                        })
-                        ->pluck('full_name', 'cui'))
-                    ->searchable()
-                    ->required(),
-                Forms\Components\DatePicker::make('death_date')
-                    ->label('Fecha de Fallecimiento')
-                    ->required(),
-                Forms\Components\Select::make('death_cause_id')
-                    ->label('Causa de Muerte')
-                    ->options(DeathCause::pluck('name', 'id'))
-                    ->searchable()
-                    ->required(),
-                Forms\Components\TextInput::make('origin')
-                    ->label('Procedencia')
-                    ->maxLength(100),
-                Forms\Components\Textarea::make('notes')
-                    ->label('Notas')
-                    ->maxLength(65535),
+                Forms\Components\Tabs::make('Tabs')
+                    ->tabs([
+                        Forms\Components\Tabs\Tab::make('Persona Existente')
+                            ->schema([
+                                Forms\Components\Select::make('cui')
+                                    ->label('Persona')
+                                    ->options(Person::select(DB::raw("CONCAT(first_name, ' ', last_name, ' (', cui, ')') AS full_name"), 'cui')
+                                        ->whereNotIn('cui', function ($query) {
+                                            $query->select('cui')->from('deceased');
+                                        })
+                                        ->pluck('full_name', 'cui'))
+                                    ->searchable()
+                                    ->preload()
+                                    ->reactive()
+                                    ->afterStateUpdated(fn($state, callable $set) => $set('use_existing_person', !empty($state)))
+                                    ->required(fn(callable $get) => $get('use_existing_person') === true),
+                            ]),
+                        Forms\Components\Tabs\Tab::make('Nueva Persona')
+                            ->schema([
+                                Forms\Components\TextInput::make('new_cui')
+                                    ->label('CUI / DPI')
+                                    ->required(fn(callable $get) => $get('use_existing_person') === false)
+                                    ->maxLength(13)
+                                    ->unique(table: 'people', column: 'cui')
+                                    ->reactive()
+                                    ->afterStateUpdated(fn($state, callable $set) => $set('use_existing_person', empty($state))),
+
+                                Forms\Components\TextInput::make('first_name')
+                                    ->label('Nombres')
+                                    ->required(fn(callable $get) => $get('use_existing_person') === false)
+                                    ->maxLength(100),
+
+                                Forms\Components\TextInput::make('last_name')
+                                    ->label('Apellidos')
+                                    ->required(fn(callable $get) => $get('use_existing_person') === false)
+                                    ->maxLength(100),
+
+                                Forms\Components\Select::make('gender_id')
+                                    ->label('Género')
+                                    ->options(Gender::pluck('name', 'id'))
+                                    ->required(fn(callable $get) => $get('use_existing_person') === false),
+
+                                Forms\Components\TextInput::make('email')
+                                    ->label('Correo Electrónico')
+                                    ->email()
+                                    ->maxLength(100),
+
+                                Forms\Components\TextInput::make('phone')
+                                    ->label('Teléfono')
+                                    ->tel()
+                                    ->maxLength(20),
+
+                                Forms\Components\Section::make('Dirección Principal')
+                                    ->schema([
+                                        Forms\Components\Select::make('department_id')
+                                            ->label('Departamento')
+                                            ->options(Department::pluck('name', 'id'))
+                                            ->required(fn(callable $get) => $get('use_existing_person') === false),
+
+                                        Forms\Components\TextInput::make('address_line')
+                                            ->label('Dirección')
+                                            ->required(fn(callable $get) => $get('use_existing_person') === false)
+                                            ->maxLength(255),
+
+                                        Forms\Components\Textarea::make('reference')
+                                            ->label('Referencia')
+                                            ->maxLength(65535),
+                                    ])->columns(2),
+                            ]),
+                    ])->columnSpanFull(),
+
+                Forms\Components\Hidden::make('use_existing_person')
+                    ->default(true),
+
+                Forms\Components\Section::make('Información del Fallecimiento')
+                    ->schema([
+                        Forms\Components\DatePicker::make('death_date')
+                            ->label('Fecha de Fallecimiento')
+                            ->required(),
+
+                        Forms\Components\Select::make('death_cause_id')
+                            ->label('Causa de Muerte')
+                            ->options(DeathCause::pluck('name', 'id'))
+                            ->searchable()
+                            ->required(),
+
+                        Forms\Components\TextInput::make('origin')
+                            ->label('Procedencia')
+                            ->maxLength(100),
+
+                        Forms\Components\Textarea::make('notes')
+                            ->label('Notas')
+                            ->maxLength(65535)
+                            ->columnSpanFull(),
+                    ])->columns(3),
             ]);
     }
 

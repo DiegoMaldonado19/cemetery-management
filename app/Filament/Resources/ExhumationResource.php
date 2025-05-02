@@ -79,10 +79,10 @@ class ExhumationResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('requester_cui')
                             ->label('Solicitante')
-                            ->options(
-                                Person::select(DB::raw("CONCAT(first_name, ' ', last_name) AS full_name"), 'cui')
-                                    ->pluck('full_name', 'cui')
-                            )
+                            ->options(function () {
+                                return Person::select(DB::raw("CONCAT(first_name, ' ', last_name, ' (', cui, ')') AS full_name"), 'cui')
+                                    ->pluck('full_name', 'cui');
+                            })
                             ->searchable()
                             ->required(),
 

@@ -65,10 +65,22 @@ class ContractResource extends Resource
 
                         Forms\Components\Select::make('deceased_id')
                             ->label('Fallecido')
-                            ->relationship('deceased.person', 'first_name', function (Builder $query) {
-                                return $query->with('deceased');
+                            ->options(function () {
+                                return Deceased::with('person')
+                                    ->whereDoesntHave('contracts', function ($query) {
+                                        $query->where(function ($q) {
+                                            $q->whereHas('status', function ($s) {
+                                                $s->whereIn('name', ['Vigente', 'En Gracia']);
+                                            });
+                                        });
+                                    })
+                                    ->get()
+                                    ->mapWithKeys(function ($deceased) {
+                                        return [
+                                            $deceased->id => $deceased->person->first_name . ' ' . $deceased->person->last_name . ' (' . $deceased->person->cui . ')'
+                                        ];
+                                    });
                             })
-                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->first_name . ' ' . $record->last_name)
                             ->searchable()
                             ->preload()
                             ->required()
@@ -79,10 +91,10 @@ class ContractResource extends Resource
 
                         Forms\Components\Select::make('responsible_cui')
                             ->label('Responsable')
-                            ->options(
-                                Person::select(DB::raw("CONCAT(first_name, ' ', last_name) AS full_name"), 'cui')
-                                    ->pluck('full_name', 'cui')
-                            )
+                            ->options(function () {
+                                return Person::select(DB::raw("CONCAT(first_name, ' ', last_name, ' (', cui, ')') AS full_name"), 'cui')
+                                    ->pluck('full_name', 'cui');
+                            })
                             ->searchable()
                             ->required(),
                     ]),
@@ -235,7 +247,7 @@ class ContractResource extends Resource
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
                     ->visible(fn () => Auth::hasUser() && Auth::user()->isAdmin() || Auth::user()->isHelper()),
-                Tables\Actions\Action::make('renovate')
+                    Tables\Actions\Action::make('renovate')
                     ->label('Generar Renovación')
                     ->icon('heroicon-o-currency-dollar')
                     ->color('success')
@@ -250,7 +262,7 @@ class ContractResource extends Resource
                             ->first();
 
                         if ($pendingRenewal) {
-                            return;
+                            return redirect()->route('filament.admin.resources.payments.print', $pendingRenewal);
                         }
 
                         // Generar número de recibo
@@ -260,7 +272,7 @@ class ContractResource extends Resource
                         // Crear boleta de pago para renovación
                         $unpaidStatus = PaymentStatus::where('name', 'No Pagado')->first();
 
-                        \App\Models\Payment::create([
+                        $payment = \App\Models\Payment::create([
                             'contract_id' => $record->id,
                             'receipt_number' => $receiptNumber,
                             'amount' => 600.00, // Monto fijo según requerimientos
@@ -283,6 +295,9 @@ class ContractResource extends Resource
                             'created_at' => now(),
                             'updated_at' => now(),
                         ]);
+
+                        // Redirigir a la página de impresión
+                        return redirect()->route('filament.admin.resources.payments.print', $payment);
                     })
                     ->requiresConfirmation()
                     ->modalHeading('Generar boleta de renovación')

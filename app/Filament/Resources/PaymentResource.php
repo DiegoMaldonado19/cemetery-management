@@ -79,6 +79,10 @@ class PaymentResource extends Resource
                             ->label('Fecha de Pago')
                             ->nullable()
                             ->afterOrEqual('issue_date'),
+
+                        // Invisible field to store user ID
+                        Forms\Components\Hidden::make('user_id')
+                            ->default(fn() => Auth::id()),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Estado y Comprobante')
