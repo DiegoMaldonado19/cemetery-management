@@ -219,7 +219,7 @@ class ExhumationResource extends Resource
                     })
                     ->badge()
                     ->color('danger')
-                    ->visible(fn($record) => $record->contract->niche->historical_figure_id !== null),
+                    ->visible(fn($record) => $record?->contract?->niche?->historical_figure_id !== null),
 
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Registrado Por')

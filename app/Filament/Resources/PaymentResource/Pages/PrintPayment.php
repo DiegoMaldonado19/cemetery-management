@@ -10,7 +10,7 @@ class PrintPayment extends Page
 {
     protected static string $resource = PaymentResource::class;
 
-    protected static string $view = 'filament.resources.payment-resource.pages.print-payment';
+    protected static string $view = 'filament.payment-resource.pages.print-payment';
 
     public Payment $record;
 
