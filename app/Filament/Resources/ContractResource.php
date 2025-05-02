@@ -234,7 +234,7 @@ class ContractResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn () => Auth::hasUser() && Auth::user()->isAdmin()),
+                    ->visible(fn () => Auth::hasUser() && Auth::user()->isAdmin() || Auth::user()->isHelper()),
                 Tables\Actions\Action::make('renovate')
                     ->label('Generar Renovación')
                     ->icon('heroicon-o-currency-dollar')
@@ -289,7 +289,7 @@ class ContractResource extends Resource
                     ->modalDescription('¿Está seguro de generar una boleta de renovación para este contrato? Se creará una boleta por Q600.00')
                     ->modalSubmitActionLabel('Sí, generar boleta')
                     ->visible(fn (Contract $record) =>
-                        (Auth::hasUser() && (Auth::user()->isAdmin() || Auth::user()->isHelper())) &&
+                        (Auth::hasUser() && (Auth::user()->isAdmin())) &&
                         $record->status->name !== 'Finalizado'
                     ),
             ])
